@@ -1,0 +1,53 @@
+%% Template file for verifying and comparing the performance 
+%% of the quantized FIR Filters 
+%
+%% Sinusoidal signal generation
+clear all
+close all
+clc
+%%Time specifications:
+Fs = 8000;                   % samples per second
+dt = 1/Fs;                   % seconds per sample
+StopTime = 0.01;             % seconds
+t = (0:dt:StopTime-dt)';     % seconds
+%%Sine wave: x = x1 + x2
+x = sin(2*pi*200*t)+sin(2*pi*2000*t);
+% Plot the signal versus time:
+figure;
+plot(t,x);
+xlabel('time (in seconds)');
+title('Signal versus Time');
+
+
+%% Your code for filtering 
+% Complete the rest of the code to filter the input signal x using the four
+% filters that you design. Compare the frequency response of the filters.
+% Also compare the output signals to understand the error introduced due to
+% quantized coefficients.
+%
+b_4 = load('b_4.mat');
+b_8 = load('b_8.mat');
+b_16 = load('b_16.mat');
+b_ref = load('b_ref.mat');
+
+y_ref = filter(b_ref.b_ref, [1], x);
+y_16 = filter(b_16.b_16, [1], x);
+error_1 = mag2db(sum(abs(double(y_16)-y_ref)));
+
+y_8 = filter(b_8.b_8, [1], x);
+error_2 = mag2db(sum(abs(double(y_8-y_ref))));
+
+y_4 = filter(b_4.b_4, [1], x);
+error_3 = mag2db(sum(abs(double(y_4-y_ref))));
+
+
+figure;
+hold on
+plot(t, y_ref);
+plot(t, y_16);
+plot(t, y_8);
+plot(t, y_4);
+hold off
+legend('yref', 'y16', 'y8', 'y4');
+xlabel('time (in seconds)');
+title('Signal versus Time');
